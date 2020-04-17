@@ -1,79 +1,96 @@
 <template>
-	<div id="app">
-		<div class="header">
-			<h1>Chatroom</h1>
-			<p class="username">Username: {{ username }}</p>
-			<p class="online">Online: {{ users.length }}</p>
-		</div>
-		<ChatRoom v-bind:messages="messages" v-on:sendMessage="this.sendMessage" />
-	</div>
+  <div id="app">
+    <div class="header">
+      <h1>Customer Support</h1>
+      <p class="username">Username: {{ username }}</p>
+      <p class="online">Online: {{ users.length }}</p>
+    </div>
+    <ChatRoom v-bind:messages="messages" v-on:sendMessage="this.sendMessage" />
+    <div class="footer">
+      Pair Programmed with Moa Dijkwel and Aya Dijkwel
+      <a href="https://https://github.com/moadij/chatroom" target="_blank"
+        >Github</a
+      >
+    </div>
+  </div>
 </template>
 
 <script>
-import io from 'socket.io-client';
-import ChatRoom from './components/ChatRoom';
+import io from "socket.io-client";
+import ChatRoom from "./components/ChatRoom";
 export default {
-	name: 'app',
-	components: {
-		ChatRoom
-	},
-	data: function () {
-		return {
-			username: "",
-			socket: io("http://localhost:3000"),
-			messages: [],
-			users: []
-		}
-	},
-	methods: {
-		joinServer: function () {
-			this.socket.on('loggedIn', data => {
-				this.messages = data.messages;
-				this.users = data.users;
-				this.socket.emit('newuser', this.username);
-			});
-			this.listen();
-		},
-		listen: function () {
-			this.socket.on('userOnline', user => {
-				this.users.push(user);
-			});
-			this.socket.on('userLeft', user => {
-				this.users.splice(this.users.indexOf(user), 1);
-			});
-			this.socket.on('msg', message => {
-				this.messages.push(message);
-			});
-		},
-		sendMessage: function (message) {
-			this.socket.emit('msg', message);
-		}
-	},
-	mounted: function () {
-		this.username = prompt("What is your username?", "Anonymous");
-		if (!this.username) {
-			this.username = "Anonymous";
-		}
-		this.joinServer();
-	}
-}
+  name: "app",
+  components: {
+    ChatRoom
+  },
+  data: function() {
+    return {
+      username: "",
+      socket: io("http://localhost:3000"),
+      messages: [],
+      users: []
+    };
+  },
+  methods: {
+    joinServer: function() {
+      this.socket.on("loggedIn", data => {
+        this.messages = data.messages;
+        this.users = data.users;
+        this.socket.emit("newuser", this.username);
+      });
+      this.listen();
+    },
+    listen: function() {
+      this.socket.on("userOnline", user => {
+        this.users.push(user);
+      });
+      this.socket.on("userLeft", user => {
+        this.users.splice(this.users.indexOf(user), 1);
+      });
+      this.socket.on("msg", message => {
+        this.messages.push(message);
+      });
+    },
+    sendMessage: function(message) {
+      this.socket.emit("msg", message);
+    }
+  },
+  mounted: function() {
+    this.username = prompt("What is your username?", "Anonymous");
+    if (!this.username) {
+      this.username = "Anonymous";
+    }
+    this.joinServer();
+  }
+};
 </script>
 
 <style lang="scss">
 body {
-	font-family: 'Avenir', Helvetica, Arial, sans-serif;
-	color: #2C3E50;
-	margin: 0;
-	padding: 0;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  color: #2c3e50;
+  margin: 0;
+  padding: 0;
 }
 #app {
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-	width: 100%;
-	max-width: 768px;
-	margin: 0 auto;
-	padding: 15px;
-	box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 15px;
+  box-sizing: border-box;
+
+  .footer {
+    height: 50px;
+    padding: 20px 100px 0px 100px;
+    background: #e3e3e3;
+    font-size: 12px;
+  }
+
+  .footer a {
+    color: #000;
+  }
 }
 </style>
