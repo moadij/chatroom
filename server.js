@@ -8,56 +8,56 @@ let messages = [];
 mongoose.connect("mongodb://localhost:27017/chatapp");
 
 const ChatSchema = mongoose.Schema({
-	username: String,
-	msg: String
+  username: String,
+  msg: String
 });
 
 const ChatModel = mongoose.model("chat", ChatSchema);
 
 ChatModel.find((err, result) => {
-	if (err) throw err;
+  if (err) throw err;
 
-	messages = result;
+  messages = result;
 });
 
 io.on("connection", socket => {
-	socket.emit('loggedIn', {
-		users: users.map(s => s.username),
-		messages: messages
-	});
+  socket.emit("loggedIn", {
+    users: users.map(s => s.username),
+    messages: messages
+  });
 
-	socket.on('newuser', username => {
-		console.log(`${username} has arrived at the party.`);
-		socket.username = username;
-		
-		users.push(socket);
+  socket.on("newuser", username => {
+    console.log(`${username} has arrived at the party.`);
+    socket.username = username;
 
-		io.emit('userOnline', socket.username);
-	});
+    users.push(socket);
 
-	socket.on('msg', msg => {
-		let message = new ChatModel({
-			username: socket.username,
-			msg: msg
-		});
+    io.emit("userOnline", socket.username);
+  });
 
-		message.save((err, result) => {
-			if (err) throw err;
+  socket.on("msg", msg => {
+    let message = new ChatModel({
+      username: socket.username,
+      msg: msg
+    });
 
-			messages.push(result);
+    message.save((err, result) => {
+      if (err) throw err;
 
-			io.emit('msg', result);
-		});
-	});
-	
-	// Disconnect
-	socket.on("disconnect", () => {
-		console.log(`${socket.username} has left the party.`);
-		io.emit("userLeft", socket.username);
-		users.splice(users.indexOf(socket), 1);
-	});
+      messages.push(result);
+
+      io.emit("msg", result);
+    });
+  });
+
+  // Disconnect
+  socket.on("disconnect", () => {
+    console.log(`${socket.username} has left the party.`);
+    io.emit("userLeft", socket.username);
+    users.splice(users.indexOf(socket), 1);
+  });
 });
 
-http.listen(process.env.PORT || 3000, () => {
-	console.log("Listening on port %s", process.env.PORT || 3000);
+http.listen(process.env.PORT || 3005, () => {
+  console.log("Listening on port %s", process.env.PORT || 3005);
 });
